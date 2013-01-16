@@ -1,0 +1,69 @@
+These structs are to demonstrate the layout of a CWAD file.   Note that they are not actual working structs.
+
+In C++:
+
+	struct CWAD {
+		char     IDTag[4] = "CWAD";
+		CWADFILE Files[];
+	};
+
+	struct CWADFILE {
+		DWORD dwPackedSize;
+		DWORD dwNameLength;
+		DWORD dwFullSize;
+		DWORD dwFlags;
+		char  lpFileName[dwNameLength];
+		BYTE  lpData[dwPackedSize];
+	};
+
+In VB:
+
+	Type CWAD
+		IDTag As String * 4 = "CWAD"
+		Files() as CWADFILE
+	End Type
+
+	Type CWADFILE
+		dwPackedSize As Long
+		dwNameLength As Long
+		dwFullSize As Long
+		dwFlags As Long
+		lpFileName As String * dwNameLength
+		lpData(dwPackedSize) As Byte
+	End Type
+
+At the beginning, there are 4 bytes, the string "CWAD".  After that there is a CWADFILE struct for each file until the end of the CWAD file.  After the 16 bytes for the header for each file is the filename, then the actual file data, then the next file header.
+
+If dwFlags is 0, the file is uncompressed.
+If it is 1, the file is compressed.
+
+Filenames are encrypted with a fairly simple encryption method.  Here is some code for decrypting them:
+
+In C++:
+
+void DecryptData(BYTE *lpBuffer, DWORD dwBufferLength)
+{
+	if (lpBuffer==0 || dwBufferLength==0) return;
+	lpBuffer += dwBufferLength - 1;
+	BYTE byCWadKey;
+	byCWadKey = (BYTE)(66 - (dwBufferLength << 1));
+	for (DWORD i=0;i<dwBufferLength;i++) {
+		lpBuffer[0] ^= (BYTE)(byCWadKey + (i << 1));
+		lpBuffer--;
+	}
+}
+
+In VB:
+
+Sub DecryptData(ByRef lpBuffer As String)
+	Dim byCWadKey As Byte, i As Long, n As Long
+	n = Len(lpBuffer)
+	byCWadKey = (66 - (n * 2)) Mod 256
+	For i = 0 To Len(lpBuffer) - 1
+		Mid(lpBuffer, n, 1) = Chr$(Asc(Mid$(lpBuffer, n, 1)) Xor ((byCWadKey + (i * 2)) Mod 256))
+		n = n - 1
+	Next i
+End Function
+
+The actual file data is compressed with zlib's compress function, so use zlib's decompress function to decompress the file data.  You may get zlib at http://www.gzip.org/zlib/
+
