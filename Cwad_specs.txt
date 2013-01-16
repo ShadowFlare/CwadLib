@@ -65,5 +65,5 @@ Sub DecryptData(ByRef lpBuffer As String)
 	Next i
 End Function
 
-The actual file data is compressed with zlib's compress function, so use zlib's decompress function to decompress the file data.  You may get zlib at http://www.gzip.org/zlib/
+The actual file data is compressed with zlib's compress function, so use zlib's decompress function to decompress the file data.  You may get zlib at http://zlib.net/
 
