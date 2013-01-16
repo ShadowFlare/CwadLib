@@ -28,7 +28,12 @@
 #ifndef CWADLIB_INCLUDED
 #define CWADLIB_INCLUDED
 
+#ifdef _WIN32
 #include <tchar.h>
+#else
+#define TCHAR char
+#endif
+#include <stdio.h>
 
 #define CWAD_INFO_NUM_FILES       0x03 //Number of files in CWAD
 #define CWAD_INFO_SIZE            0x05 //Size of CWAD or uncompressed file

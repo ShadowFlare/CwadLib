@@ -89,6 +89,12 @@ void CWadListFilesInternal(void *hCWAD);
 unsigned long CWadFindHeaderAndSize(FILE *hFile, unsigned long *pnCwadEnd);
 void CWadDecryptData(UInt8 *pBuffer, unsigned long nBufferLength);
 
+#ifndef _WIN32
+#define _T(x) x
+#define _tfopen fopen
+#define _tcsdup strdup
+#endif
+
 void * CWadOpenArchive(const TCHAR *pszFileName)
 {
 	if (!pszFileName)
